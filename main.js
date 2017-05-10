@@ -144,7 +144,7 @@
     });
   }
 
-    // generates a random unique position cells on the board
+  // generates a random unique position cells on the board
   function generateRandomArr() {
     const { xN, yN, percent } = gridSettings,
           randomArr = [],
