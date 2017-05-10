@@ -1,0 +1,12 @@
+body {
+  margin: 0;
+}
+
+main {
+  display: flex;
+  justify-content: center;
+}
+
+canvas {
+  border: 3px solid #ff5722;
+}
