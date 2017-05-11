@@ -1,6 +1,7 @@
 body{
   margin:0;
   padding:0;
+  background: #ff5722;
 }
 
 main {
@@ -10,6 +11,7 @@ main {
 
 canvas {
   border: 3px solid #ff5722;
+  background: white;
 }
 
 div#cover {
@@ -25,20 +27,16 @@ div#cover {
 
 .loader {
   border: 16px solid #f3f3f3;
+  -webkit-border-radius: 50%;
   border-radius: 50%;
   border-top: 15px solid #00BCD4;
   border-bottom: 15px solid #FF9800;
   width: 120px;
   height: 120px;
   margin: auto;
-  -webkit-animation: spin 2s linear infinite;
   animation: spin 2s linear infinite;
   z-index: 2;
-}
-
-@-webkit-keyframes spin {
-  0% { -webkit-transform: rotate(0deg); }
-  100% { -webkit-transform: rotate(360deg); }
+  background: #607d8b;
 }
 
 @keyframes spin {
