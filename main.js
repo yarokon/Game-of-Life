@@ -1,4 +1,6 @@
 window.onload = () => {
+  'use strict';
+
   const canvas = document.getElementById('game');
 
   const screen = {
@@ -91,7 +93,7 @@ window.onload = () => {
 
   setTimeout(() => {
     document.getElementById('cover').remove();
-  }, 500);
+  }, 600);
 
   function setCanvasSize() {
     const { boardWidth, boardHeight } = gridSettings;
