@@ -1,6 +1,5 @@
-(() => {
-  const canvas = document.getElementById('game'),
-        ctx = canvas.getContext('2d');
+window.onload = () => {
+  const canvas = document.getElementById('game');
 
   const screen = {
     w: window.innerWidth,
@@ -9,8 +8,8 @@
 
   const gridSettings = {
     percent: 15,
-    step: 10,
-    lineWidth: 1,
+    step: 12,
+    lineWidth: 2,
     lineColor: '#9e9e9e',
     get xN() {
       return (screen.w - this.borderWidth * 2 + this.lineWidth) / this.step ^ 0
@@ -64,6 +63,7 @@
 
     drawCell() {
       const { pixel, step } = gridSettings;
+      ctx.fillStyle = 'black';
       ctx.fillRect(this.x * step, this.y * step, pixel, pixel);
 
       this._alive = true;
@@ -71,7 +71,8 @@
 
     eraseCell() {
       const { pixel, step } = gridSettings;
-      ctx.clearRect(this.x * step, this.y * step, pixel, pixel);
+      ctx.fillStyle = '#f5fa73';
+      ctx.fillRect(this.x * step, this.y * step, pixel, pixel);
 
       this._alive = false;
     }
@@ -80,12 +81,17 @@
   /*** Initialize the Game ***/
 
   setCanvasSize();
+
+  const ctx = canvas.getContext('2d'),
+        state = createState(null);
+
   drawLines();
-
-  const state = createState(null);
-
   fillState();
   breatheLife();
+
+  setTimeout(() => {
+    document.getElementById('cover').remove();
+  }, 500);
 
   function setCanvasSize() {
     const { boardWidth, boardHeight } = gridSettings;
@@ -113,7 +119,6 @@
     ctx.stroke();
   }
 
-
   function createState(stuffing) {
     const { xN, yN } = gridSettings,
           state = [];
@@ -133,7 +138,6 @@
         new Cell(i);
       }
   }
-
 
   function breatheLife() {
     const randArr = generateRandomArr(gridSettings);
@@ -170,7 +174,7 @@
 
   tick.click = true;
 
-  document.body.onclick = () => {
+  canvas.onclick = () => {
     if (tick.click) {
       setInterval(tick, 100);
       tick.click = false;
@@ -246,4 +250,4 @@
     }
   }
 
-})();
+};
