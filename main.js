@@ -6,18 +6,18 @@ window.onload = () => {
   const screen = {
     w: window.innerWidth,
     h: window.innerHeight
-  }
+  };
 
   const gridSettings = {
-    percent: 15,
+    percent: 17,
     step: 12,
     lineWidth: 2,
     lineColor: '#9e9e9e',
     get xN() {
-      return (screen.w - this.borderWidth * 2 + this.lineWidth) / this.step ^ 0
+      return (screen.w - this.borderWidth * 2 + this.lineWidth) / this.step ^ 0;
     },
     get yN() {
-      return (screen.h - this.borderWidth * 2 + this.lineWidth) / this.step ^ 0
+      return (screen.h - this.borderWidth * 2 + this.lineWidth) / this.step ^ 0;
     },
     get pixel() {
       return this.step - this.lineWidth;
@@ -44,7 +44,7 @@ window.onload = () => {
     }
 
     static toXY(id) {
-      return new Point( id % gridSettings.xN, Math.floor(id / gridSettings.xN) )
+      return new Point( id % gridSettings.xN, Math.floor(id / gridSettings.xN) );
     }
   }
 
@@ -93,7 +93,7 @@ window.onload = () => {
 
   setTimeout(() => {
     document.getElementById('cover').remove();
-  }, 600);
+  }, 700);
 
   function setCanvasSize() {
     const { boardWidth, boardHeight } = gridSettings;
@@ -181,16 +181,16 @@ window.onload = () => {
       setInterval(tick, 100);
       tick.click = false;
     }
-  }
+  };
 
   function countAllNeighbours() {
-    const {xN, yN} = gridSettings,
+    const { xN, yN } = gridSettings,
           neighbours = createState(0);
 
     for (let y = 0; y < yN; y++) {
       for (let x = 0; x < xN; x++) {
         if (state[y][x]) {
-          neighbours[y][x] = countCellNeighbours(new Point(x, y), state);
+          neighbours[y][x] = countCellNeighbours( new Point(x, y) );
         }
       }
     }
@@ -198,7 +198,7 @@ window.onload = () => {
     return neighbours;
   }
 
-  function countCellNeighbours(point, state) {
+  function countCellNeighbours(point) {
     let { x, y } = point,
         count = 0;
 
@@ -215,7 +215,7 @@ window.onload = () => {
 
         if (!state[y]) {
           x += 3;
-          break;;
+          break;
         }
 
         if (state[y][x]) {
