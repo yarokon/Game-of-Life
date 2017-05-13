@@ -1,23 +1,18 @@
 window.onload = () => {
   'use strict';
 
-  const canvas = document.getElementById('game');
-
-  const screen = {
-    w: window.innerWidth,
-    h: window.innerHeight
-  };
-
-  const gridSettings = {
-    percent: 17,
+  const settings = {
+    percent: 18,
     step: 12,
     lineWidth: 2,
     lineColor: '#9e9e9e',
+    screenWidth: window.innerWidth,
+    screenHeight: window.innerHeight,
     get xN() {
-      return (screen.w - this.borderWidth * 2 + this.lineWidth) / this.step ^ 0;
+      return (this.screenWidth - this.borderWidth * 2 + this.lineWidth) / this.step ^ 0;
     },
     get yN() {
-      return (screen.h - this.borderWidth * 2 + this.lineWidth) / this.step ^ 0;
+      return (this.screenHeight - this.borderWidth * 2 + this.lineWidth) / this.step ^ 0;
     },
     get pixel() {
       return this.step - this.lineWidth;
@@ -32,6 +27,11 @@ window.onload = () => {
       return parseInt( getComputedStyle(canvas).borderWidth );
     }
   };
+
+  const canvas = document.getElementById('game'),
+        ctx = canvas.getContext('2d'),
+        gridSettings = Object.assign({}, settings),
+        state = create2Darr(gridSettings.xN, gridSettings.yN);
 
   class Point {
     constructor(x, y) {
@@ -78,22 +78,35 @@ window.onload = () => {
 
       this._alive = false;
     }
+
+    countNeighbours() {
+      return this.neighbours.reduce( (sum, cell) => sum + cell.isAlive(), 0 );
+    }
   }
 
   /*** Initialize the Game ***/
 
   setCanvasSize();
-
-  const ctx = canvas.getContext('2d'),
-        state = createState(null);
-
   drawLines();
+
   fillState();
+  assignRelatives();
+
   breatheLife();
 
   setTimeout(() => {
     document.getElementById('cover').remove();
-  }, 700);
+  }, 800);
+
+  function create2Darr(xN, yN, stuffing=null) {
+    const arr = [];
+
+    for (let i = 0; i < yN; i++) {
+      arr[i] = new Array(xN).fill(stuffing);
+    }
+
+    return arr;
+  }
 
   function setCanvasSize() {
     const { boardWidth, boardHeight } = gridSettings;
@@ -121,17 +134,6 @@ window.onload = () => {
     ctx.stroke();
   }
 
-  function createState(stuffing) {
-    const { xN, yN } = gridSettings,
-          state = [];
-
-    for (let i = 0; i < yN; i++) {
-      state[i] = new Array(xN).fill(stuffing);
-    }
-
-    return state;
-  }
-
   function fillState() {
       const { xN, yN } = gridSettings,
       N = xN * yN;
@@ -139,6 +141,50 @@ window.onload = () => {
       for (let i = 0; i < N; i++) {
         new Cell(i);
       }
+  }
+
+  function assignRelatives() {
+    const { xN, yN } = gridSettings;
+
+    for (let y = 0; y < yN; y++) {
+      for (let x = 0; x < xN; x++) {
+        groupCellNeighbours(state[y][x]);
+      }
+    }
+  }
+
+  function groupCellNeighbours(cell) {
+    let { x, y } = Point.toXY(cell.id);
+    const cellNeighbours = [];
+
+    // left top cell
+    x--; y--;
+
+    for (let i = 0; i < 3; i++) {
+      for (let j = 0; j < 3;  j++) {
+
+        if (i === 1 && j === 1) {
+          x++;
+          continue;
+        }
+
+        if (!state[y]) {
+          x += 3;
+          break;
+        }
+
+        if (state[y][x]) {
+          cellNeighbours.push(state[y][x]);
+        }
+
+        x++;
+      }
+
+      y += 1;
+      x -= 3;
+    }
+
+    cell.neighbours = cellNeighbours;
   }
 
   function breatheLife() {
@@ -185,51 +231,15 @@ window.onload = () => {
 
   function countAllNeighbours() {
     const { xN, yN } = gridSettings,
-          neighbours = createState(0);
+          neighbours = create2Darr(xN, yN, 0);
 
     for (let y = 0; y < yN; y++) {
       for (let x = 0; x < xN; x++) {
-        if (state[y][x]) {
-          neighbours[y][x] = countCellNeighbours( new Point(x, y) );
-        }
+        neighbours[y][x] = state[y][x].countNeighbours();
       }
     }
 
     return neighbours;
-  }
-
-  function countCellNeighbours(point) {
-    let { x, y } = point,
-        count = 0;
-
-    // left top cell
-    x--; y--;
-
-    for (let i = 0; i < 3; i++) {
-      for (let j = 0; j < 3;  j++) {
-
-        if (i === 1 && j === 1) {
-          x++;
-          continue;
-        }
-
-        if (!state[y]) {
-          x += 3;
-          break;
-        }
-
-        if (state[y][x]) {
-          count += state[y][x].isAlive();
-        }
-
-        x++;
-      }
-
-      y += 1;
-      x -= 3;
-    }
-
-    return count;
   }
 
   // main logic
