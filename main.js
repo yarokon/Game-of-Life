@@ -2,7 +2,7 @@ window.onload = () => {
   'use strict';
 
   const settings = {
-    percent: 18,
+    percent: 16,
     step: 12,
     lineWidth: 2,
     lineColor: '#9e9e9e',
@@ -31,7 +31,7 @@ window.onload = () => {
   const canvas = document.getElementById('game'),
         ctx = canvas.getContext('2d'),
         gridSettings = Object.assign({}, settings),
-        state = create2Darr(gridSettings.xN, gridSettings.yN);
+        state = create2DArr(gridSettings.xN, gridSettings.yN);
 
   class Point {
     constructor(x, y) {
@@ -71,9 +71,9 @@ window.onload = () => {
       this._alive = true;
     }
 
-    eraseCell() {
+    eraseCell(fullErase) {
       const { pixel, step } = gridSettings;
-      ctx.fillStyle = '#f5fa73';
+      ctx.fillStyle = fullErase ? 'white' : '#f5fa73';
       ctx.fillRect(this.x * step, this.y * step, pixel, pixel);
 
       this._alive = false;
@@ -93,12 +93,13 @@ window.onload = () => {
   assignRelatives();
 
   breatheLife();
+  killSuicidalCells();
 
   setTimeout(() => {
     document.getElementById('cover').remove();
   }, 800);
 
-  function create2Darr(xN, yN, stuffing=null) {
+  function create2DArr(xN, yN, stuffing=null) {
     const arr = [];
 
     for (let i = 0; i < yN; i++) {
@@ -213,6 +214,20 @@ window.onload = () => {
     return randomArr.slice(-N * percent / 100);
   }
 
+  function killSuicidalCells() {
+    const { xN, yN } = gridSettings;
+
+    for (let y = 0; y < yN; y++) {
+      for (let x = 0; x < xN; x++) {
+        const cell = state[y][x];
+
+        if ( cell.isAlive() && cell.countNeighbours() === 0 ) {
+          cell.eraseCell(true);
+        }
+      }
+    }
+  }
+
   /*** Game cycle ***/
 
   function tick() {
@@ -231,7 +246,7 @@ window.onload = () => {
 
   function countAllNeighbours() {
     const { xN, yN } = gridSettings,
-          neighbours = create2Darr(xN, yN, 0);
+          neighbours = create2DArr(xN, yN, 0);
 
     for (let y = 0; y < yN; y++) {
       for (let x = 0; x < xN; x++) {
